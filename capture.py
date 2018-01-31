@@ -2,6 +2,8 @@
 # note - may need to change syntax of export command for CSR
 
 import cli
+import subprocess
+import sys
 
 
 def acl_command(proto,src,dst):
@@ -38,3 +40,14 @@ def cap_cleanup():
     cli.execute(cmd)
     configuration = 'no ip access-list extended PKT_CAP'  # delete capture ACL so next capture has a fresh filter
     cli.configure(configuration)
+
+def cap_check():
+    output = subprocess.check_output('ps -ef | grep xepacketcap.py', shell=True)
+    parts = output.split(' ')
+    if '/flash/xepacketcap.py' in parts:
+        print 'Capture underway, try again later'
+        sys.exit()
+    else:
+        pass
+
+

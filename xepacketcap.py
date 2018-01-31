@@ -18,6 +18,8 @@ parser.add_argument('filename', help='Filename to upload to bucket')
 parser.add_argument('--seconds', help='Seconds to capture', default=10)
 args = parser.parse_args()
 
+cap_check()
+
 #bucket = args.bucket
 filename = args.filename
 proto = args.protocol
