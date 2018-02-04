@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-import cli
 import sys
 # from csr_aws_guestshell import cag
 import argparse
 import time
 from capture import *
+import random
 
 
 parser = argparse.ArgumentParser(
@@ -18,17 +18,19 @@ parser.add_argument('filename', help='Filename to upload to bucket')
 parser.add_argument('--seconds', help='Seconds to capture', default=10)
 args = parser.parse_args()
 
-cap_check()
-
 #bucket = args.bucket
+duration = args.seconds
 filename = args.filename
 proto = args.protocol
 src = args.src
 dst = args.dst
+jobID = random.randint(100000,999999)
+
+cap_wait(jobID, duration)
 
 start_capture(proto,src,dst)
 
-for i in range(0, int(args.seconds)):
+for i in range(0, int(duration)):
     time.sleep(1)
     sys.stdout.write("\r%d secs" % (i + 1))
     sys.stdout.flush()
