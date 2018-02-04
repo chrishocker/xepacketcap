@@ -38,15 +38,11 @@ def start_capture(proto,src,dst):
 
 def cap_cleanup(jobID):
     cli.execute("monitor capture PKT_CAP stop")
-    cmd = "monitor capture PKT_CAP export location flash:%s" % filename  # changed syntax to fit Cat9K
+    cmd = "monitor capture PKT_CAP export location flash:%s" % filename
     cli.execute(cmd)
     configuration = 'no ip access-list extended PKT_CAP'  # delete capture ACL so next capture has a fresh filter
     cli.configure(configuration)
-    conn = sqlite3.connect('capdb.db')
-    c = conn.cursor()
-    c.execute('DELETE from CAPJOBS where JOB_ID = %d', (jobID))
-    conn.commit()
-    conn.close()
+    del_job_from_db(jobID)
 
 
 def cap_check():
@@ -59,13 +55,16 @@ def cap_check():
         pass
 
 def cap_wait(jobID,duration):
+    #determine whether we need to wait for other jobs to finish
+    #calculate the number of rows in the jobs database, assign to int(numrows)
     conn = sqlite3.connect('capdb.db')
     c = conn.cursor()
     count = c.execute('select count(*) from jobs;')
     rows = c.fetchone()
     numrows = rows[0]
     if numrows == 0:
-        break # if there are no jobs in the queue, GO!!!!
+        # if there are no jobs in the database, add my job to database and GO!!!!
+        add_job_to_db(jobID, duration)
     else:
         #calculate wait time based on duration of jobs already in queue
         c.execute('select duration from jobs')
@@ -73,10 +72,8 @@ def cap_wait(jobID,duration):
         wait = 10 # add 10 second buffer to wait time
         for i in output:
             wait = wait + output[i][0]
-        #add my job to capdb
-        conn.execute('INSERT INTO CAPJOBS (JOBID, DURATION) VALUES' %d, %d', (jobID, duration))
-        conn.commit()
-        conn.close()
+            #add my job to capdb
+            add_job_to_db(jobID, duration)
         #begin wait counter
         for i in range(0, wait):
             time.sleep(1)
@@ -84,6 +81,19 @@ def cap_wait(jobID,duration):
                sys.stdout.flush()'''
         # when wait time completes, proceed with capture
         # future enhancement: check db again to verify I'm at the top of the list, if yes then go ahead
+
+def add_job_to_db(jobID,duration):
+    conn = sqlite3.connect('capdb.db')
+    conn.execute('INSERT into CAPJOBS (JOB_ID, DURATION) VALUES %d %d', (jobID, duration))
+    conn.commit()
+    conn.close()
+
+def del_job_from_db(jobID):
+    conn = sqlite3.connect('capdb.db')
+    c = conn.cursor()
+    c.execute('DELETE from CAPJOBS where JOB_ID = %d', jobID)
+    conn.commit()
+    conn.close()
 
 
 
