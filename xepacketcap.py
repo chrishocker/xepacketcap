@@ -4,7 +4,7 @@ import sys
 import argparse
 import time
 from capture import *
-import random
+from random import randint
 
 
 parser = argparse.ArgumentParser(
@@ -24,7 +24,7 @@ filename = args.filename
 proto = args.protocol
 src = args.src
 dst = args.dst
-jobID = random.randint(100000,999999)
+jobID = randint(100000,999999)
 
 cap_wait(jobID, duration)
 
@@ -38,6 +38,6 @@ for i in range(0, int(duration)):
 print "\n"
 
 
-cap_cleanup()
+cap_cleanup(jobID)
 
 # cag().upload_file(bucket, filename)
