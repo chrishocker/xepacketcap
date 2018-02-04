@@ -74,7 +74,7 @@ def cap_wait(jobID,duration):
         for i in output:
             wait = wait + output[i][0]
         #add my job to capdb
-        conn.execute('INSERT INTO CAPJOBS (JOBID, DURATION) VALUES' (%d, %d)', (jobID, duration))
+        conn.execute('INSERT INTO CAPJOBS (JOBID, DURATION) VALUES' %d, %d', (jobID, duration))
         conn.commit()
         conn.close()
         #begin wait counter
