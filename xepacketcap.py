@@ -20,15 +20,20 @@ args = parser.parse_args()
 
 #bucket = args.bucket
 duration = args.seconds
+iface = args.interface
 filename = args.filename
 proto = args.protocol
 src = args.src
 dst = args.dst
 jobID = randint(100000,999999)
+jobIDstr = str(jobID)
+
+print 'Job ID = ' + jobIDstr
+print '\n'
 
 cap_wait(jobID, duration)
 
-start_capture(proto,src,dst)
+start_capture(iface,proto,src,dst)
 
 for i in range(0, int(duration)):
     time.sleep(1)
@@ -38,6 +43,6 @@ for i in range(0, int(duration)):
 print "\n"
 
 
-cap_cleanup(jobID)
+cap_cleanup(jobID,filename)
 
 # cag().upload_file(bucket, filename)
