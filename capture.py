@@ -15,7 +15,7 @@ def acl_command(proto,src,dst):
     elif (src == 'any') and (dst != 'any'):
         command = '''ip access-list extended PKT_CAP
                      permit %s %s host %s''' %(proto,src,dst)
-    elif (src != 'any') and (dst != 'any'):
+    elif (src != 'any') and (dst == 'any'):
         command = '''ip access-list extended PKT_CAP
                      permit %s host %s %s''' %(proto,src,dst)
     else:
@@ -32,7 +32,7 @@ def start_capture(iface,proto,src,dst):
     cli.configure(configuration)
     cli.execute(
         "monitor capture PKT_CAP access-list PKT_CAP buffer circular size 100")
-    cmd = "monitor capture PKT_CAP interface %s both" %(iface)
+    cmd = "monitor capture PKT_CAP interface %s both" % iface
     cli.execute(cmd)
     cli.execute("monitor capture PKT_CAP clear")
     print 'Your capture is starting...'
