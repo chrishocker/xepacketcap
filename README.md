@@ -1,6 +1,6 @@
 # xepacketcap
 
-##High Level Tasks (in priority order)
+### High Level Tasks (in priority order)
 
 * [Create a better dev environment](#dev-environment) (All)
 * [Create the guestshell packet capture module in Python](#packet-capture-python-module) (Paul)
