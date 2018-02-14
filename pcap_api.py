@@ -1,7 +1,6 @@
 from flask import Flask, url_for, jsonify, request,\
     make_response, copy_current_request_context
 from flask.ext.sqlalchemy import SQLAlchemy
-from chapter9_pexpect_1 import show_version
 import uuid
 import functools
 from threading import Thread
