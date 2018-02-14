@@ -27,7 +27,7 @@ def acl_command(proto,src,dst):
 
 def start_capture(iface,proto,src,dst):
     configuration = acl_command(proto, src, dst)
-    print configuration
+    #print configuration
     print '\n'
     cli.configure(configuration)
     cli.execute(
@@ -36,7 +36,8 @@ def start_capture(iface,proto,src,dst):
     cli.execute(cmd)
     cli.execute("monitor capture PKT_CAP clear")
     print 'Your capture is starting...'
-    # print 'Job ID = ' + jobIDstr
+    print 'Job ID = ' + jobIDstr
+    print '\n'
     cli.execute("monitor capture PKT_CAP start")
 
 
@@ -46,7 +47,7 @@ def cap_cleanup(jobID,filename):
     cli.execute(cmd)
     configuration = 'no ip access-list extended PKT_CAP'  # delete capture ACL so next capture has a fresh filter
     cli.configure(configuration)
-    del_job_from_db(jobID)
+    update_job_status(jobID)
 
 
 def cap_check():
@@ -63,7 +64,7 @@ def cap_wait(jobID,duration):
     #calculate the number of rows in the jobs database, assign to int(numrows)
     conn = sqlite3.connect('capdb.db')
     c = conn.cursor()
-    c.execute('select count(*) from jobs;')
+    c.execute('select count(*) from jobs where status like "INPROGRESS"')
     rows = c.fetchone()
     numrows = rows[0]
     if numrows == 0:
@@ -71,7 +72,7 @@ def cap_wait(jobID,duration):
         add_job_to_db(jobID, duration)
     else:
         #calculate wait time based on duration of jobs already in queue
-        c.execute('select duration from jobs')
+        c.execute('select duration from jobs where status like "INPROGRESS"')
         output = c.fetchall()
         output = [i[0] for i in output] #convert list of tuples to list of ints
         wait = 10 # add 10 second buffer to wait time
@@ -91,7 +92,7 @@ def cap_wait(jobID,duration):
 
 def add_job_to_db(jobID,duration):
     conn = sqlite3.connect('capdb.db')
-    conn.execute('INSERT into jobs (JOB_ID, DURATION) VALUES (?, ?)', (jobID, duration))
+    conn.execute('INSERT into jobs (JOB_ID, DURATION, STATUS) VALUES (?, ?, ?)', (jobID, duration, 'INPROGRESS'))
     conn.commit()
     conn.close()
 
@@ -99,5 +100,12 @@ def del_job_from_db(jobID):
     conn = sqlite3.connect('capdb.db')
     c = conn.cursor()
     c.execute('DELETE from jobs where JOB_ID = (?)', (jobID,))
+    conn.commit()
+    conn.close()
+
+def update_job_status(jobID):
+    conn = sqlite3.connect('capdb.db')
+    c = conn.cursor()
+    c.execute('UPDATE jobs set status = "COMPLETE" where JOB_ID = (?)', (jobID,))
     conn.commit()
     conn.close()
