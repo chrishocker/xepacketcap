@@ -1,10 +1,22 @@
 #!/usr/bin/env python
-import sys
 # from csr_aws_guestshell import cag
 import argparse
-import time
 from capture import *
 from random import randint
+
+'''A sqlite3 database named "capdb.db" is required to run this script. It must be located in the flash directory.
+   Initialize the database with the following commands from the guestshell prompt:
+   
+         [guestshell@guestshell ~]$ cd /flash
+         [guestshell@guestshell flash]$ sqlite3 capdb.db
+         SQLite version 3.7.17 2013-05-20 00:56:22
+         Enter ".help" for instructions
+         Enter SQL statements terminated with a ";"
+         sqlite> create table jobs(id integer primary key autoincrement, job_id int, duration int, status text);
+         sqlite> .quit 
+         [guestshell@guestshell flash]$  
+         
+   '''
 
 
 parser = argparse.ArgumentParser(
@@ -31,17 +43,11 @@ jobIDstr = str(jobID)
 print 'Job ID = ' + jobIDstr
 print '\n'
 
-cap_wait(jobID, duration)
+wait = cap_wait(jobID, duration)
 
-start_capture(iface,proto,src,dst)
-
-for i in range(0, int(duration)):
-    time.sleep(1)
-    sys.stdout.write("\r%d secs" % (i + 1))
-    sys.stdout.flush()
+start_capture(iface,proto,src,dst,jobID,wait,duration)
 
 print "\n"
-
 
 cap_cleanup(jobID,filename)
 
