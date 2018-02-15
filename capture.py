@@ -5,6 +5,7 @@ import cli
 import sys
 import sqlite3
 import time
+#from random import randint
 
 
 def acl_command(proto,src,dst):
@@ -26,6 +27,7 @@ def acl_command(proto,src,dst):
 def cap_wait(jobID,duration):
     #determine whether we need to wait for other jobs to finish
     #calculate the number of rows in the jobs database, assign to int(numrows)
+    #jobID = randint(100000, 999999)
     conn = sqlite3.connect('capdb.db')
     c = conn.cursor()
     c.execute('select count(*) from jobs where status like "INPROGRESS"\
@@ -56,7 +58,7 @@ def cap_wait(jobID,duration):
             sys.stdout.write("\r%d secs" % (i + 1))
             sys.stdout.flush()
         # when wait time completes, proceed with capture
-        return wait
+    return wait #, jobID
 
 
 def start_capture(iface,proto,src,dst,jobID,wait,duration):
