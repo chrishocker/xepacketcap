@@ -5,6 +5,7 @@ from capture import *
 import uuid
 import functools
 from threading import Thread
+from random import randint
 
 
 app = Flask(__name__)
@@ -123,7 +124,7 @@ def edit_pcap(id):
     return jsonify({})
 
 @app.route('/pcap_jobs/<int:id>/run', methods=['POST'])
-@background
+#@background
 def run_pcap_job(id):
     pcap = Pcap.query.get_or_404(id)
     jobID = randint(100000,999999)
