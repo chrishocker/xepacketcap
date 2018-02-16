@@ -12,11 +12,11 @@ from random import randint
          SQLite version 3.7.17 2013-05-20 00:56:22
          Enter ".help" for instructions
          Enter SQL statements terminated with a ";"
-         sqlite> create table jobs(id integer primary key autoincrement, job_id int, duration int, status text);
+         sqlite> create table jobs(id integer primary key autoincrement, job_id int,\ 
+                                   duration int, status text, URL text);
          sqlite> .quit 
          [guestshell@guestshell flash]$  
-         
-   '''
+'''
 
 
 parser = argparse.ArgumentParser(
@@ -54,6 +54,6 @@ start_capture(iface,proto,src,dst,jobID,wait,duration)
 
 print "\n"
 
-cap_cleanup(jobID,filename)
+cap_cleanup(jobID,bucket,filename)
 
-upload_file(bucket,filename)
+# upload_file(bucket,filename)
