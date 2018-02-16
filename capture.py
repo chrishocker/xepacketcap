@@ -5,6 +5,7 @@ import cli
 import sys
 import sqlite3
 import time
+import boto3
 #from random import randint
 
 
@@ -123,4 +124,16 @@ def display_countdown(duration):
         time.sleep(1)
         sys.stdout.write("\r%d secs" % (i + 1))
         sys.stdout.flush()
+
+
+def upload_file(bucket, filename, directory="/bootflash/"):
+    s3_client = boto3.client('s3')
+    try:
+        s3_client.upload_file(directory + filename, bucket, filename)
+    except Exception as e:
+        print "Uploading file Failed.  Error: %s" % (e)
+        return False
+    print "Upload Complete to S3 bucket %s" % (bucket)
+    return True
+
 
