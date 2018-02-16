@@ -31,8 +31,7 @@ def cap_wait(jobID,duration):
     #jobID = randint(100000, 999999)
     conn = sqlite3.connect('capdb.db')
     c = conn.cursor()
-    c.execute('select count(*) from jobs where status like "INPROGRESS"\
-                or status like "WAITING"')
+    c.execute('select count(*) from jobs where status not like "COMPLETE"')
     rows = c.fetchone()
     numrows = rows[0]
 
@@ -42,8 +41,7 @@ def cap_wait(jobID,duration):
         wait = 0
     else:
         #calculate wait time based on duration of jobs already in queue
-        c.execute('select duration from jobs where status like "INPROGRESS"\
-                    or status like "WAITING"')
+        c.execute('select duration from jobs where status not like "COMPLETE"')
         output = c.fetchall()
         output = [i[0] for i in output] #convert list of tuples to list of ints
         wait = 10 # add 10 second buffer to wait time
@@ -84,13 +82,14 @@ def start_capture(iface,proto,src,dst,jobID,wait,duration):
         display_countdown(duration)
 
 
-def cap_cleanup(jobID,filename):
+def cap_cleanup(jobID,bucket,filename):
     cli.execute("monitor capture PKT_CAP stop")
     cmd = "monitor capture PKT_CAP export flash:%s" % filename
     cli.execute(cmd)
     configuration = 'no ip access-list extended PKT_CAP'  # delete capture ACL so next capture has a fresh filter
     cli.configure(configuration)
-    update_status_complete(jobID)
+    upload_file(bucket,filename,jobID)
+    update_status_complete(bucket,filename,jobID)
 
 
 def add_job_status_inprogress(jobID,duration):
@@ -99,18 +98,23 @@ def add_job_status_inprogress(jobID,duration):
     conn.commit()
     conn.close()
 
+
 def add_job_status_waiting(jobID,duration):
     conn = sqlite3.connect('capdb.db')
     conn.execute('INSERT into jobs (JOB_ID, DURATION, STATUS) VALUES (?, ?, ?)', (jobID, duration, 'WAITING'))
     conn.commit()
     conn.close()
 
-def update_status_complete(jobID):
+
+def update_status_complete(bucket,filename,jobID):
+    URL = 'https://s3-us-west-1.amazonaws.com/{}/{}'.format(bucket,filename)
     conn = sqlite3.connect('capdb.db')
     c = conn.cursor()
+    c.execute('UPDATE jobs set URL = (?) where JOB_ID = (?)', (URL, jobID))
     c.execute('UPDATE jobs set status = "COMPLETE" where JOB_ID = (?)', (jobID,))
     conn.commit()
     conn.close()
+
 
 def update_status_inprogress(jobID):
     conn = sqlite3.connect('capdb.db')
@@ -119,6 +123,15 @@ def update_status_inprogress(jobID):
     conn.commit()
     conn.close()
 
+
+def update_status_uploading(jobID):
+    conn = sqlite3.connect('capdb.db')
+    c = conn.cursor()
+    c.execute('UPDATE jobs set status = "UPLOADING" where JOB_ID = (?)', (jobID,))
+    conn.commit()
+    conn.close()
+
+
 def display_countdown(duration):
     for i in range(0, int(duration)):
         time.sleep(1)
@@ -126,8 +139,9 @@ def display_countdown(duration):
         sys.stdout.flush()
 
 
-def upload_file(bucket, filename, directory="/bootflash/"):
+def upload_file(bucket,filename,jobID,directory="/bootflash/"):
     s3_client = boto3.client('s3')
+    update_status_uploading(jobID)
     try:
         s3_client.upload_file(directory + filename, bucket, filename)
     except Exception as e:
