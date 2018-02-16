@@ -38,7 +38,7 @@ proto = args.protocol
 src = args.src
 dst = args.dst
 jobID = randint(100000,999999)
-#jobIDstr = str(jobID)
+jobIDstr = str(jobID)
 
 print 'Job ID = ' + jobIDstr
 print '\n'
