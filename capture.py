@@ -3,7 +3,6 @@
 
 import cli
 
-
 def acl_command(proto,src,dst):
     if (src == 'any') and (dst == 'any'):
         command = '''ip access-list extended PKT_CAP
