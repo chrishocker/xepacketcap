@@ -1,4 +1,4 @@
- from flask import Flask, url_for, jsonify, request,\
+from flask import Flask, url_for, jsonify, request,\
     make_response, copy_current_request_context
 from flask_sqlalchemy import SQLAlchemy
 from capture import *
