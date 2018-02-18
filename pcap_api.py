@@ -57,7 +57,7 @@ class Pcap(db.Model):
             self.filename = data['filename']
             self.seconds = data['seconds']
         except KeyError as e:
-            raise ValidationError('Invalid device: missing ' + e.args[0])
+            raise ValidationError('Invalid Job: missing ' + e.args[0])
         return self
 
 
@@ -141,7 +141,7 @@ def run_pcap_job(id):
     wait = cap_wait(jobID, seconds)
     start_capture(interface,protocol,src,dst,jobID,wait,seconds)
     cap_cleanup(jobID,bucket,filename)
-    return jsonify(Pcap.query.get_or_404(id).export_data()), 201, {'Location': device.get_url()}
+    return jsonify(Pcap.query.get_or_404(id).export_data()), 201, {'Location': pcap.get_url()}
 
 @app.route('/status/<id>', methods=['GET'])
 def get_task_status(id):
