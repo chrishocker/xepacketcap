@@ -1,6 +1,6 @@
-from flask import Flask, url_for, jsonify, request,\
+ from flask import Flask, url_for, jsonify, request,\
     make_response, copy_current_request_context
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 from capture import *
 import uuid
 import functools
@@ -25,6 +25,7 @@ class Pcap(db.Model):
     __tablename__ = 'pcap_jobs'
     id = db.Column(db.Integer, primary_key=True)
     interface = db.Column(db.String(64))
+    bucket = db.Column(db.String(64))
     protocol = db.Column(db.String(64))
     src = db.Column(db.String(64))
     dst = db.Column(db.String(64))
@@ -38,6 +39,7 @@ class Pcap(db.Model):
         return {
             'self_url': self.get_url(),
             'interface': self.interface,
+            'bucket': self.bucket,
             'protocol': self.protocol,
             'src': self.src,
             'dst': self.dst,
@@ -48,6 +50,7 @@ class Pcap(db.Model):
     def import_data(self, data):
         try:
             self.interface = data['interface']
+            self.bucket = data['bucket']
             self.protocol = data['protocol']
             self.src = data['src']
             self.dst = data['dst']
@@ -129,6 +132,7 @@ def run_pcap_job(id):
     pcap = Pcap.query.get_or_404(id)
     jobID = randint(100000,999999)
     interface = pcap.interface
+    bucket = pcap.bucket
     protocol = pcap.protocol
     src = pcap.src
     dst = pcap.dst
@@ -136,8 +140,8 @@ def run_pcap_job(id):
     seconds = pcap.seconds
     wait = cap_wait(jobID, seconds)
     start_capture(interface,protocol,src,dst,jobID,wait,seconds)
-    cap_cleanup(jobID,filename)
-    return jsonify({}), 201, {'Location': pcap.get_url()}
+    cap_cleanup(jobID,bucket,filename)
+    return jsonify(Pcap.query.get_or_404(id).export_data()), 201, {'Location': device.get_url()}
 
 @app.route('/status/<id>', methods=['GET'])
 def get_task_status(id):
