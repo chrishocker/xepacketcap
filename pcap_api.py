@@ -161,7 +161,7 @@ def run_pcap_job(id):
     </style>
     <body>
         <h1>Packet capure with Job ID #''' + job + ''' has been completed<h1>
-        <p>PCAP file ''' + filename + ''' has been uploaded to AWS S3 bucket''' + bucket + '''. </p>
+        <p>PCAP file ''' + filename + ''' has been uploaded to AWS S3 bucket ''' + bucket + '''. </p>
         <p><a href="https://s3-us-west-1.amazonaws.com/''' + bucket + '''/''' + filename + '''">Download PCAP File</a></p>
     </body>
 </html>'''
