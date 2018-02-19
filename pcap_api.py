@@ -151,11 +151,11 @@ def run_pcap_job(id):
     <style>
     body {background-color: Gray;}
     h1   {
-          color: White;
+          color: Black;
           background-color:LightGray;
          }
     p    {
-          color: White;
+          color: Black;
           background-color:LightGray;
          }
     </style>
