@@ -126,7 +126,7 @@ def edit_pcap(id):
     db.session.commit()
     return jsonify({})
 
-@app.route('/pcap_jobs/<int:id>/run', methods=['POST'])
+@app.route('/pcap_jobs/<int:id>/run', methods=['GET'])
 #@background
 def run_pcap_job(id):
     pcap = Pcap.query.get_or_404(id)
@@ -141,6 +141,7 @@ def run_pcap_job(id):
     wait = cap_wait(jobID, seconds)
     start_capture(interface,protocol,src,dst,jobID,wait,seconds)
     cap_cleanup(jobID,bucket,filename)
+    job = str(jobID)
     #return jsonify(Pcap.query.get_or_404(id).export_data()), 201, {'Location': pcap.get_url()}
     return '''
 <html>
@@ -148,18 +149,19 @@ def run_pcap_job(id):
         <title>Home Page - Packet Capture Application</title>
     </head>
     <style>
-    body {background-color: powderblue;}
+    body {background-color: Gray;}
     h1   {
-          color: DodgerBlue;
+          color: White;
           background-color:LightGray;
          }
     p    {
-          color: DodgerBlue; background-color:LightGray;
+          color: White;
+          background-color:LightGray;
          }
     </style>
     <body>
-        <h1>Packet capure ''' + jobID + ''' has been completed<h1>
-        <p>PCAP ''' + filename + ''' has been uploaded to AWS S3 ''' + bucket + '''. </p>
+        <h1>Packet capure with Job ID #''' + job + ''' has been completed<h1>
+        <p>PCAP file ''' + filename + ''' has been uploaded to AWS S3 bucket''' + bucket + '''. </p>
         <p><a href="https://s3-us-west-1.amazonaws.com/''' + bucket + '''/''' + filename + '''">Download PCAP File</a></p>
     </body>
 </html>'''
