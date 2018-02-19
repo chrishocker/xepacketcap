@@ -57,7 +57,7 @@ class Pcap(db.Model):
             self.filename = data['filename']
             self.seconds = data['seconds']
         except KeyError as e:
-            raise ValidationError('Invalid Job: missing ' + e.args[0])
+            raise ValidationError('Invalid job: missing ' + e.args[0])
         return self
 
 
@@ -141,7 +141,29 @@ def run_pcap_job(id):
     wait = cap_wait(jobID, seconds)
     start_capture(interface,protocol,src,dst,jobID,wait,seconds)
     cap_cleanup(jobID,bucket,filename)
-    return jsonify(Pcap.query.get_or_404(id).export_data()), 201, {'Location': pcap.get_url()}
+    #return jsonify(Pcap.query.get_or_404(id).export_data()), 201, {'Location': pcap.get_url()}
+    return '''
+<html>
+    <head>
+        <title>Home Page - Packet Capture Application</title>
+    </head>
+    <style>
+    body {background-color: powderblue;}
+    h1   {
+          color: DodgerBlue;
+          background-color:LightGray;
+         }
+    p    {
+          color: DodgerBlue; background-color:LightGray;
+         }
+    </style>
+    <body>
+        <h1>Packet capure ''' + jobID + ''' has been completed<h1>
+        <p>PCAP ''' + filename + ''' has been uploaded to AWS S3 ''' + bucket + '''. </p>
+        <p><a href="https://s3-us-west-1.amazonaws.com/''' + bucket + '''/''' + filename + '''">Download PCAP File</a></p>
+    </body>
+</html>'''
+
 
 @app.route('/status/<id>', methods=['GET'])
 def get_task_status(id):
