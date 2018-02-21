@@ -77,6 +77,7 @@ def upload_capture(job_id, bucket,filename,directory="/bootflash/"):
 
 def get_capture(job_id):
     conn = sqlite3.connect('capdb.db')
+    conn.text_factory = str
     c = conn.cursor()
     c.execute('select * from jobs where job_id like (?)', (job_id,))
     job = c.fetchone()
