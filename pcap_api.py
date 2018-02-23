@@ -1,7 +1,6 @@
 from flask import Flask, url_for, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from capture import *
-from get_capture import *
 from threading import Thread
 from random import randint
 
@@ -48,11 +47,14 @@ def pcap_status():
         get_capture(job_id)
 
 
-        return '''<h1>Enter Job ID: {}</h1>'''.format(job_id)
+        return '''<h1>Status: {}</h1>'''.format(job)
 
-    return jsonify({result})
+    return '''<form method="POST">
+                Enter Job ID: <input type="text" name="job_id"><br>
+                <input type="submit" value="Submit"><br>
+            </form>'''
 
-@app.route('/pcap_json/', methods=['POST'])
+@app.route('/pcap_json', methods=['POST'])
 def run_pcap_json():
     req_data = request.get_json()
     job_id = randint(100000,999999)
@@ -67,13 +69,13 @@ def run_pcap_json():
     add_capture(job_id,iface,proto,src,dst,duration,bucket,filename)
     return "This is your job ID: " + job
 
-@app.route('/pcap_json/', methods=['GET'])
+@app.route('/status_json', methods=['POST'])
 def status_json():
     req_data = request.get_json()
     job_id = req_data['job_id']
-    get_capture(job_id)
-    return result
-    
+    job = get_capture(job_id)
+    return job
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
