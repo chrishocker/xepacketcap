@@ -34,7 +34,8 @@ def start_capture(job_id, iface, proto, src, dst):
     print('job_id %d starting' % job_id)
     cli.execute("monitor capture PKT_CAP start")
 
-def add_capture(job_id, iface, proto, src, dst, duration, bucket, filename):
+def add_capture(job_id, iface, proto, src, dst, duration, bucket):
+    filename = generate_filename()
     url = 'https://s3-us-west-1.amazonaws.com/{}/{}'.format(bucket,filename)
     conn = sqlite3.connect('capdb.db')
     conn.execute(
@@ -82,3 +83,11 @@ def get_capture(job_id):
     c.execute('select * from jobs where job_id like (?)', (job_id,))
     job = c.fetchone()
     return job
+
+def generate_filename():
+    result = cli.execute("show run | inc hostname")
+    output = result.split()
+    hostname = output[1]
+    filename = hostname + '-' + str(int(time.time() * 1000)) + '.pcap'
+    return filename
+

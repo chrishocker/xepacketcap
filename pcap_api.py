@@ -65,8 +65,7 @@ def run_pcap_json():
     dst = req_data['dst']
     duration = req_data['duration']
     bucket = req_data['bucket']
-    filename = req_data['filename']
-    add_capture(job_id,iface,proto,src,dst,duration,bucket,filename)
+    add_capture(job_id,iface,proto,src,dst,duration,bucket)
     return jsonify( {'job_id': job} )
 
 @app.route('/status_json', methods=['POST'])
