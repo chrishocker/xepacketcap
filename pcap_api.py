@@ -17,7 +17,7 @@ def run_pcap():
         dst = request.form['dst']
         duration = request.form['duration']
         bucket = request.form['bucket']
-        filename = request.form['filename']
+        
         add_capture(job_id,iface,proto,src,dst,duration,bucket,filename)
 
 
@@ -26,8 +26,7 @@ def run_pcap():
                   <h1>Source: {}</h1>
                   <h1>Destination: {}</h1>
                   <h1>Duration in Seconds: {}</h1>
-                  <h1>AWS S3 Bucket: {}</h1>
-                  <h1>Filename: {}</h1>'''.format(iface, proto, src, dst, duration, bucket, filename)
+                  <h1>AWS S3 Bucket: {}</h1>'''.format(iface, proto, src, dst, duration, bucket, filename)
 
     return '''<form method="POST">
                   Interface: <input type="text" name="iface"><br>
@@ -36,7 +35,6 @@ def run_pcap():
                   Destination: <input type="text" name="dst"><br>
                   Duration: <input type="text" name="duration"><br>
                   Bucket: <input type="text" name="bucket"><br>
-                  Filename: <input type="text" name="filename"><br>
                   <input type="submit" value="Submit"><br>
               </form>'''
 
