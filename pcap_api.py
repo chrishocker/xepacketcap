@@ -43,9 +43,10 @@ def pcap_status():
     if request.method == 'POST':  #this block is only entered when the form is submitted
         job_id = request.form['job_id']
         get_capture(job_id)
+        id, job_id, iface, proto, src, dst, duration, bucket, filename, url, status = get_capture(job_id)
+        job = id, job_id, iface, proto, src, dst, duration, bucket, filename, url, status
 
-
-        return '''<h1>Status: {}</h1>'''.format(job_id)
+        return '''<h1>Status: {}</h1>'''.format(job[10])
 
     return '''<form method="POST">
                 Enter Job ID: <input type="text" name="job_id"><br>
