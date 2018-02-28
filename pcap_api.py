@@ -45,7 +45,7 @@ def pcap_status():
         get_capture(job_id)
 
 
-        return '''<h1>Status: {}</h1>'''.format(job)
+        return '''<h1>Status: {}</h1>'''.format(job_id)
 
     return '''<form method="POST">
                 Enter Job ID: <input type="text" name="job_id"><br>
