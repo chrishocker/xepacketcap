@@ -21,12 +21,9 @@ def run_pcap():
         add_capture(job_id,iface,proto,src,dst,duration,bucket)
 
 
-        return '''<h1>Inteface: {}</h1>
-                  <h1>Protocol: {}</h1>
-                  <h1>Source: {}</h1>
-                  <h1>Destination: {}</h1>
-                  <h1>Duration in Seconds: {}</h1>
-                  <h1>AWS S3 Bucket: {}</h1>'''.format(iface, proto, src, dst, duration, bucket)
+        return '''<h1>To verify Job status please open a new browser</h1>
+                  <h1>and enter http://deviceIP:5000/status</h1>
+                  <h1>Your Job ID is: {}</h1>'''.format(job_id)
 
     return '''<form method="POST">
                   Interface: <input type="text" name="iface"><br>
