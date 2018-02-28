@@ -1,23 +1,52 @@
 # xepacketcap
 
-### High Level Tasks (in priority order)
+Use the following steps to set up the environment and run the script.
+Note: GuestShell must be enabled and configured to talk to the world. 
 
-* [Create a better dev environment](#dev-environment) (All)
-* [Create the guestshell packet capture module in Python](#packet-capture-python-module) (Paul)
-* [Define and create the API in Python Flask](#api) (Luis?)
-* [Create the central control app](#central-control-app) (?)
-* Extra credit:
-	* API security
-	* Packaging and distribution of packet capture app to IOS guestshell across multiple devices (eg. Ansible, Fog Director, etc.)
+STEP 1 - Install PIP
 
-### Dev Environment
-We need to find a way to simultaneously access the internet via laptop and push code to the Cat9K without copying and pasting into virtual desktops.  Consider switching to using CSR in CSN.
+    sudo yum -y install pip
 
-### Packet Capture Python Module
-Develop packet capture Python module that can be run in IOS guestshell.  Implement functions for start, status and stop.
 
-### API
-Define API and develop in Python Flask.  API will be served via Flask running in guestshell.  API will consume start/status/stop functions provided by Python module above.
+STEP 2 - Install Flask & Flask Alchemy
 
-### Central Control App
-Create a central control app that uses the APIs defined above to initial packet captures across multiple devices.  How this is to be done is TBD.  (Python? HTML?)
+    sudo pip install flask
+    sudo pip install flask_sqlAlchemy
+
+
+STEP 3 - Install AWSCLI & Boto3
+
+    sudo pip install awscli
+    sudo pip install boto3
+
+STEP 4 - Clone Repo
+
+    git clone https://github.com/chrishocker/xepacketcap.git
+
+STEP 5 - Set up database 
+
+    Issue the following commands from the repo directory:
+   
+         [guestshell@guestshell xepacketcap]$ sqlite3 capdb.db
+         SQLite version 3.7.17 2013-05-20 00:56:22
+         Enter ".help" for instructions
+         Enter SQL statements terminated with a ";"
+         sqlite> create table jobs(id integer primary key autoincrement, job_id int, iface text, proto text, src text, dst text, duration int, bucket text, filename text, url text, status text); 
+         sqlite> .quit 
+         [guestshell@guestshell flash]$  
+
+STEP 6 - Enable the API script and Packet Capture Daemon
+
+    From the repo directory, run the following commands:
+
+	    python pcap_api.py
+	    python xepacketcap.py
+
+Now you are ready to run packet capture jobs using the XE Packet Capture App using Sparkbot, Web Interface, Postman or CLI.
+
+From the CLI, run the following command (arguments are flexible):
+
+        python add_capture.py --seconds 10 gi1 ip any any codefest-pcap
+
+
+
