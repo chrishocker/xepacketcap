@@ -18,22 +18,4 @@ from time import sleep
 print('xepacketcap service started.')
 print('waiting for jobs...')
 
-while True:
-    conn = sqlite3.connect('capdb.db')
-    c = conn.cursor()
-    c.execute('select * from jobs where status like "WAITING" limit 1')
-    job = c.fetchone()
-    if job:
-        id, job_id, iface, proto, src, dst, duration, bucket, filename, url, status = job
-        start_capture(job_id, iface, proto, src, dst)
-        update_status(job_id, 'STARTED')
-        sleep(duration)
-        stop_capture(job_id, filename)
-        update_status(job_id, 'STOPPED')
-        update_status(job_id, 'UPLOADING')
-        if upload_capture(job_id, bucket, filename):
-            update_status(job_id, 'UPLOADED')
-        else:
-            update_status(job_id, 'ERROR')
-    else:
-        sleep(10)
+process_jobs()

@@ -34,7 +34,8 @@ def start_capture(job_id, iface, proto, src, dst):
     print('job_id %d starting' % job_id)
     cli.execute("monitor capture PKT_CAP start")
 
-def add_capture(job_id, iface, proto, src, dst, duration, bucket, filename):
+def add_capture(job_id, iface, proto, src, dst, duration, bucket):
+    filename = generate_filename()
     url = 'https://s3-us-west-1.amazonaws.com/{}/{}'.format(bucket,filename)
     conn = sqlite3.connect('capdb.db')
     conn.execute(
@@ -82,3 +83,31 @@ def get_capture(job_id):
     c.execute('select * from jobs where job_id like (?)', (job_id,))
     job = c.fetchone()
     return job
+
+def generate_filename():
+    result = cli.execute("show run | inc hostname")
+    output = result.split()
+    hostname = output[1]
+    filename = hostname + '-' + int(time.time() * 1000)
+    return filename
+    
+def process_jobs
+    while True:
+        conn = sqlite3.connect('capdb.db')
+        c = conn.cursor()
+        c.execute('select * from jobs where status like "WAITING" limit 1')
+        job = c.fetchone()
+        if job:
+            id, job_id, iface, proto, src, dst, duration, bucket, filename, url, status = job
+            start_capture(job_id, iface, proto, src, dst)
+            update_status(job_id, 'STARTED')
+            sleep(duration)
+            stop_capture(job_id, filename)
+            update_status(job_id, 'STOPPED')
+            update_status(job_id, 'UPLOADING')
+            if upload_capture(job_id, bucket, filename):
+                update_status(job_id, 'UPLOADED')
+            else:
+                update_status(job_id, 'ERROR')
+        else:
+            sleep(10)
