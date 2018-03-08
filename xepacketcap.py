@@ -1,5 +1,5 @@
 #!/usr/bin/env python 
-from capture import *
+from xepacketcap_core import *
 from time import sleep
 #import sys
 

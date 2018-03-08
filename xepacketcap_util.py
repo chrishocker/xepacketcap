@@ -30,5 +30,3 @@ def get_capture(job_id):
     except Exception as e:
         print(e)
 
-    return none
-
