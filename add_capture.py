@@ -1,5 +1,5 @@
 import argparse
-from capture import *
+from xepacketcap_util import add_capture
 from random import randint
 
 parser = argparse.ArgumentParser(

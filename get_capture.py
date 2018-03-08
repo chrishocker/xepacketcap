@@ -1,6 +1,5 @@
 import argparse
-from capture import *
-from random import randint
+from xepacketcap_util import get_capture
 
 parser = argparse.ArgumentParser(
     description="Check capture status")
