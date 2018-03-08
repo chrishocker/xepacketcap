@@ -1,21 +1,27 @@
-#!/usr/bin/env python
+#!/usr/bin/env python 
 from capture import *
 from time import sleep
+#import sys
 
-'''A sqlite3 database named "capdb.db" is required to run this script. It must be located in the flash directory.
-   Initialize the database with the following commands from the guestshell prompt:
-   
-         [guestshell@guestshell ~]$ cd /flash
-         [guestshell@guestshell flash]$ sqlite3 capdb.db
-         SQLite version 3.7.17 2013-05-20 00:56:22
-         Enter ".help" for instructions
-         Enter SQL statements terminated with a ";"
-         sqlite> create table jobs(id integer primary key autoincrement, job_id int, iface text, proto text, src text, dst text, duration int, bucket text, filename text, url text, status text); 
-         sqlite> .quit 
-         [guestshell@guestshell flash]$  
-'''
+sql_create_jobs_table = """ CREATE TABLE IF NOT EXISTS jobs (
+                                        id integer PRIMARY KEY autoincrement,
+                                        job_id int,
+                                        iface text,
+                                        proto text,
+                                        src text,
+                                        dst text,
+                                        duration int,
+                                        bucket text,
+                                        filename text,
+                                        url text,
+                                        status text
+                                    ); """
+# flush stdout immediately for logging to a file
+#sys.stdout.flush()
 
-print('xepacketcap service started.')
-print('waiting for jobs...')
+#print('xepacketcap service started.')
+print('checking for jobs...')
 
-process_jobs()
+conn = create_connection()
+create_table(conn, sql_create_jobs_table)
+process_job()
