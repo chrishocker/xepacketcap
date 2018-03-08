@@ -3,31 +3,7 @@ import sys
 import sqlite3
 import time
 import boto3
-
-# for simplicity, keep the database in memory
-db_file = '/var/tmp/capdb.db'
-
-def create_connection():
-    """ create a database connection to a SQLite database """
-    try:
-        conn = sqlite3.connect(db_file)
-        return conn
-    except Exception as e:
-        print(e)
-
-    return none
-
-def create_table(conn, create_table_sql):
-    """ create a table from the create_table_sql statement
-    :param conn: Connection object
-    :param create_table_sql: a CREATE TABLE statement
-    :return:
-    """
-    try:
-        c = conn.cursor()
-        c.execute(create_table_sql)
-    except Exception as e:
-        print(e)
+from xepacketcap_db import *
 
 def acl_command(proto,src,dst):
     if (src == 'any') and (dst == 'any'):
@@ -54,19 +30,6 @@ def start_capture(job_id, iface, proto, src, dst):
     cli.execute("monitor capture PKT_CAP clear")
     print('job_id %d starting' % job_id)
     cli.execute("monitor capture PKT_CAP start")
-
-def add_capture(job_id, iface, proto, src, dst, duration, bucket):
-    filename = generate_filename()
-    url = 'https://s3-us-west-1.amazonaws.com/{}/{}'.format(bucket,filename)
-    try:
-        conn = create_connection()
-        conn.execute(
-           'INSERT into jobs (JOB_ID, IFACE, PROTO, SRC, DST, DURATION, BUCKET, FILENAME, URL, STATUS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
-           (job_id, iface, proto, src, dst, duration, bucket, filename, url, 'WAITING'))
-        conn.commit()
-        print('job_id %d added to database with status WAITING' % job_id)
-    except Exception as e:
-        print(e)
 
 def stop_capture(job_id, filename):
     cli.execute("monitor capture PKT_CAP stop")
@@ -115,16 +78,6 @@ def get_capture(job_id):
 
     return none
 
-def generate_filename():
-    #result = cli.execute("show run | inc hostname")
-    #print(result)
-    #output = result.split()
-    #print(output)
-    #hostname = output[1]
-    #filename = hostname + '-' + str(int(time.time() * 1000))
-    filename = str(int(time.time() * 1000)) + '.pcap'
-    return filename
-    
 def process_jobs():
     while True:
         conn = create_connection()
