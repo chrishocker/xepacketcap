@@ -1,0 +1,16 @@
+[Unit]
+Description=IOS-XE Packet Capture API Service
+After=syslog.target
+
+[Service]
+Type=simple
+User=guestshell
+Group=network-admin
+WorkingDirectory=/home/guestshell/xepacketcap/
+ExecStart=/usr/bin/python -u /home/guestshell/xepacketcap/xepacketcap_api.py
+StandardOutput=syslog
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target
+

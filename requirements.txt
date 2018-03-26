@@ -1,3 +1,5 @@
+awscli==1.14.41
+boto3==1.5.32
 Flask==0.10.1
 Flask-HTTPAuth==2.2.1
 Flask-SQLAlchemy==1.0
