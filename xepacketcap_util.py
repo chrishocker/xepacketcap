@@ -8,7 +8,7 @@ def generate_filename():
 
 def add_capture(job_id, iface, proto, src, dst, duration, bucket):
     filename = generate_filename()
-    url = 'https://s3-us-west-1.amazonaws.com/{}/{}'.format(bucket,filename)
+    url = 'https://s3.amazonaws.com/{}/{}'.format(bucket,filename)
     try:
         conn = create_connection()
         conn.execute(
